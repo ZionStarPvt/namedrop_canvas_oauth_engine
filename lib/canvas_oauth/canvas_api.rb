@@ -230,7 +230,6 @@ module CanvasOauth
       }
 
       response = self.class.post '/login/oauth2/token', params
-      self.token = response['access_token']
     end
 
     def hex_sis_id(name, value)

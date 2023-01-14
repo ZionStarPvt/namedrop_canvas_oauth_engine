@@ -16,7 +16,9 @@ module CanvasOauth
 
     protected
     def initialize_canvas
-      @canvas = ::CanvasOauth::CanvasApiExtensions.build(canvas_url, user_id, tool_consumer_instance_guid)
+      tool_detail = App.where(uuid: session[:key]).first
+      organization_id = tool_detail.organization_id
+      @canvas = ::CanvasOauth::CanvasApiExtensions.build(canvas_url, user_id, tool_consumer_instance_guid, organization_id, session[:key])
     end
 
     def canvas
@@ -24,13 +26,15 @@ module CanvasOauth
     end
 
     def canvas_token
-      ::CanvasOauth::Authorization.fetch_token(user_id, tool_consumer_instance_guid)
+      AppAuthorization.authorize_an_user(user_id, tool_consumer_instance_guid, session[:key])
     end
 
     def request_canvas_authentication
       if !params[:code].present? && !canvas_token.present?
         session[:oauth2_state] = SecureRandom.urlsafe_base64(24)
-        redirect_to canvas.auth_url(canvas_oauth_url, session[:oauth2_state])
+        # Form redirect uri
+        redirect_url = canvas_oauth_url + "?redirect_to=#{response.request.fullpath}"
+        redirect_to canvas.auth_url(redirect_url, session[:oauth2_state])
       end
     end
 
