@@ -1,7 +1,7 @@
 module CanvasOauth
   class CanvasApiExtensions
     def self.build(canvas_url, user_id, tool_consumer_instance_guid, organization_id = "", app_key = "")
-      key_secret_details = App.where(organization_id: organization_id, uuid: app_key).first
+      key_secret_details = LtiProviderTool.where(organization_id: organization_id, uuid: app_key).first
       key = key_secret_details.developer_key
       secret = key_secret_details.secret
       app_id = key_secret_details.id

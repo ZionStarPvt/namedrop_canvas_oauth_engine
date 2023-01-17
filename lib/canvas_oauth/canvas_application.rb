@@ -16,7 +16,7 @@ module CanvasOauth
 
     protected
     def initialize_canvas
-      tool_detail = App.where(uuid: session[:key]).first
+      tool_detail = LtiProviderTool.where(uuid: session[:key]).first
       organization_id = tool_detail.organization_id
       @canvas = ::CanvasOauth::CanvasApiExtensions.build(canvas_url, user_id, tool_consumer_instance_guid, organization_id, session[:key])
     end
@@ -26,7 +26,7 @@ module CanvasOauth
     end
 
     def canvas_token
-      AppAuthorization.authorize_an_user(user_id, tool_consumer_instance_guid, session[:key])
+      CanvasOauthAuthorization.authorize_an_user(user_id, tool_consumer_instance_guid, session[:key])
     end
 
     def request_canvas_authentication
