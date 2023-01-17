@@ -11,7 +11,7 @@ module CanvasOauth
       rescue_from CanvasApi::Authenticate, with: :reauthenticate
       rescue_from CanvasApi::Unauthorized, with: :unauthorized_canvas_access
 
-      before_filter :request_canvas_authentication
+      before_action :request_canvas_authentication
     end
 
     protected
