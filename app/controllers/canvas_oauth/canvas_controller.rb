@@ -1,6 +1,6 @@
 module CanvasOauth
   class CanvasController < CanvasOauth::ApplicationController
-    skip_before_filter :request_canvas_authentication
+    skip_before_action :request_canvas_authentication
 
     def oauth
       redirect_path = params["redirect_to"]
