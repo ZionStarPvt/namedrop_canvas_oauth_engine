@@ -31,7 +31,11 @@ module CanvasOauth
       if !params[:code].present? && !canvas_token.present?
         session[:oauth2_state] = SecureRandom.urlsafe_base64(24)
         # Form redirect uri
-        redirect_url = canvas_oauth_url + "?redirect_to=#{response.request.fullpath}"
+        redirect_path = response.request.fullpath
+        data = redirect_path.partition("data=").last
+        data_hash = convert_string_param_to_actual_param(data).reduce({}, :merge)
+        encoded_redirect_path = "/namedrop_api_call?data=name:#{data_hash["name"]},email:#{CGI.escape(data_hash["email"])},unique_id:#{data_hash["unique_id"]},org_name:#{data_hash["org_name"]}"
+        redirect_url = canvas_oauth_url + "?redirect_to=#{encoded_redirect_path}"
         redirect_to canvas.auth_url(redirect_url, session[:oauth2_state])
       end
     end
@@ -64,5 +68,16 @@ module CanvasOauth
     def tool_consumer_instance_guid
       session[:tool_consumer_instance_guid]
     end
+
+    def convert_string_param_to_actual_param(data)
+      converted_params = []
+      comma_spe_datum = data.split(',')
+      comma_spe_datum.each do |comma_spe_data|
+        collen_sep_datum = comma_spe_data.split(':')
+        converted_params << Hash[*collen_sep_datum.flatten(1)]
+      end
+      converted_params
+    end
+
   end
 end
