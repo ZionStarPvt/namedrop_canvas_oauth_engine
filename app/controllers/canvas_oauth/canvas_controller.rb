@@ -4,9 +4,13 @@ module CanvasOauth
 
     def oauth
       redirect_path = params["redirect_to"]
-      data = redirect_path.partition("data=").last
-      data_hash = convert_string_param_to_actual_param(data).reduce({}, :merge)
-      encoded_redirect_path = "/namedrop_api_call?data=name:#{data_hash["name"]},email:#{CGI.escape(data_hash["email"])},unique_id:#{data_hash["unique_id"]},org_name:#{data_hash["org_name"]}"
+      if redirect_path.include? "data"
+        data = redirect_path.partition("data=").last
+        data_hash = convert_string_param_to_actual_param(data).reduce({}, :merge)
+        encoded_redirect_path = "/namedrop_api_call?data=name:#{data_hash["name"]},email:#{CGI.escape(data_hash["email"])},unique_id:#{data_hash["unique_id"]},org_name:#{data_hash["org_name"]}"
+      else
+        encoded_redirect_path = redirect_path
+      end
       if verify_oauth2_state(params[:state]) && params[:code]
         if (token_details = canvas.get_access_token(params[:code]))
           access_token = token_details["access_token"]
