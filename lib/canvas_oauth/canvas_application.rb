@@ -35,7 +35,8 @@ module CanvasOauth
         if redirect_path.include? "data"
           data = redirect_path.partition("data=").last
           data_hash = convert_string_param_to_actual_param(data).reduce({}, :merge)
-          encoded_redirect_path = "/namedrop_api_call?data=name:#{data_hash["name"]},email:#{CGI.escape(data_hash["email"])},unique_id:#{data_hash["unique_id"]},org_name:#{data_hash["org_name"]}"
+          # URI.encode is used to handle special characters like ñ, è
+          encoded_redirect_path = "/namedrop_api_call?data=name:#{URI.encode(data_hash["name"])},email:#{CGI.escape(data_hash["email"])},unique_id:#{data_hash["unique_id"]},org_name:#{URI.encode(data_hash["org_name"])}"
         else
           encoded_redirect_path = redirect_path
         end
