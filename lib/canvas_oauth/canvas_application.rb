@@ -32,15 +32,7 @@ module CanvasOauth
         session[:oauth2_state] = SecureRandom.urlsafe_base64(24)
         # Form redirect uri
         redirect_path = response.request.fullpath
-        if redirect_path.include? "data"
-          data = redirect_path.partition("data=").last
-          data_hash = convert_string_param_to_actual_param(data).reduce({}, :merge)
-          # URI.encode is used to handle special characters like ñ, è
-          encoded_redirect_path = "/namedrop_api_call?data=name:#{URI.encode(data_hash["name"])},email:#{CGI.escape(data_hash["email"])},unique_id:#{data_hash["unique_id"]},org_name:#{URI.encode(data_hash["org_name"])}"
-        else
-          encoded_redirect_path = redirect_path
-        end
-        redirect_url = canvas_oauth_url + "?redirect_to=#{encoded_redirect_path}"
+        redirect_url = canvas_oauth_url + "?redirect_to=#{redirect_path}"
         redirect_to canvas.auth_url(redirect_url, session[:oauth2_state])
       end
     end
